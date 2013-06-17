@@ -57,9 +57,10 @@ void calc_mean(std::vector<VectorXd> &X, VectorXd &avg) {
 }
 
 void remove_com(std::vector<VectorXd> &X) {
-  Vector3d com(Vector3d::Zero());
-
+    Vector3d com;
   for (std::vector<VectorXd>::iterator it = X.begin() ; it != X.end(); ++it) {
+    com = Vector3d::Zero();
+
     for( int i = 0; i < (*it).size(); i += 3) {
       com[0] += (*it)[i + 0];
       com[1] += (*it)[i + 1];
