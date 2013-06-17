@@ -65,14 +65,12 @@ void remove_com(std::vector<VectorXd> &X) {
       com[1] += (*it)[i + 1];
       com[2] += (*it)[i + 2];
     }
-  }
-
-  for (std::vector<VectorXd>::iterator it = X.begin() ; it != X.end(); ++it)
     for( int i = 0; i < (*it).size(); i += 3) {
       (*it)[i + 0] -= com[0] / (*it).size();
       (*it)[i + 1] -= com[1] / (*it).size();
       (*it)[i + 2] -= com[2] / (*it).size();
     }
+  }
 }
 
 void calc_cov(std::vector<VectorXd> &X, MatrixXd &covm, VectorXd &avg) {
@@ -97,6 +95,34 @@ void calc_cov(std::vector<VectorXd> &X, MatrixXd &covm, VectorXd &avg) {
 }
 
 int main(int argc, char **argv) {
+  std::ofstream evec, eval;
+
+  std::string evec_filename, eval_filename;
+  
+  switch(argc) {
+  case 3:
+    evec_filename = "eigenvectors.dat";
+    eval_filename = "eigenvalues.dat";
+    break;
+  case 5:
+    evec_filename = argv[3];
+    eval_filename = argv[4];
+  default:
+    std::cout << "usage: " << argv[0] << " <particles_per_sample> <sample_filename> [ <eigenvector_filename> ] [ <eigenvalue_filename> ]" << std::endl;
+    return -1;
+    break;
+  }
+ 
+  evec.open(evec_filename.c_str());
+
+  if(evec.bad())
+    std::cout << "Error opening file" << evec_filename << std::endl;
+
+  eval.open(eval_filename.c_str());
+
+  if(eval.bad())
+    std::cout << "Error opening file" << eval_filename << std::endl;
+
   int particles_per_sample = atoi(argv[1]);
   std::vector<VectorXd> samples;
   VectorXd mean(3*particles_per_sample);
@@ -111,5 +137,8 @@ int main(int argc, char **argv) {
 
   es.compute(cov);
 
-  std::cout << es.eigenvectors() << std::endl;
+  evec << es.eigenvectors();
+  eval << es.eigenvalues();
+
+  return (es.info() == Success);
 }
